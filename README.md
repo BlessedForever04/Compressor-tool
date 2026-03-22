@@ -1,2 +1,2 @@
-# Huffman-compressor-decompressor
+# Compressor-tool
 // Update later
