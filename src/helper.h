@@ -1,14 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void decompress(){
+    //find bit flag (f/n type)
+}
+
+void fastCompression(){
+    //LZMA
+}
+
+void normalCompression(){
+    //huffman
+}
+
 void help(){
     printf("\nCurrent commands in use :\n\n");
-    printf("Fast file compression       ./compressor -c -f file_name.extension\n");
-    printf("Normal file compression     ./compressor -c -n file_name.extension\n");
-    printf("Decompress file             ./compressor -d file_name.extension\n");
+    printf("Fast file compression       ./compressor -c -f < input_file_name.extension > output_file_name.custom_extension\n");
+    printf("Normal file compression     ./compressor -c -n < input_file_name.extension > output_file_name.custom_extension\n");
+    printf("Decompress file             ./compressor -d < input_file_name.extension > output_file_name.custom_extension\n");
     printf("About                       ./compressor -about\n");
     printf("GitHub repo                 ./compressor -github\n");
     printf("\nFor more information about tool, checkout github repo.\n\n");
+}
+
+void error(){
+    printf("Incorrent command, try ./main -help\n");
 }
 
 void github(){

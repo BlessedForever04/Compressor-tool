@@ -20,6 +20,25 @@ int main(int argc, char* argv[]){
         else if (strcmp(argv[1], "-about") == 0) {
             about();
         }
+        else if(strcmp(argv[1], "-d") == 0){
+            decompress();
+        }
+    }
+    else if(argc == 3){
+        if(strcmp(argv[1], "-c") == 0){
+            if(strcmp(argv[2], "-f") == 0){
+                fastCompression();
+            }
+            else if(stdcmp(argv[2], "-n") == 0){
+                normalCompression();
+            }
+            else{
+                error();
+            }
+        }
+    }
+    else{
+        error();
     }
 
     return 0;
