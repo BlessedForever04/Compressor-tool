@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 void help(){
     printf("\nCurrent commands in use :\n\n");
@@ -15,5 +16,9 @@ void github(){
 }
 
 void about(){
-    
+    FILE *fptr = popen("curl -s https://raw.githubusercontent.com/BlessedForever04/Compressor-tool/main/README.md", "r");
+    char response[1024];
+    while(fgets(response, sizeof(response), fptr)){
+        printf("%s", response);
+    }
 }
