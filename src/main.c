@@ -29,7 +29,7 @@ int main(int argc, char* argv[]){
             if(strcmp(argv[2], "-f") == 0){
                 fastCompression();
             }
-            else if(stdcmp(argv[2], "-n") == 0){
+            else if(strcmp(argv[2], "-n") == 0){
                 normalCompression();
             }
             else{

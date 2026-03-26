@@ -32,9 +32,17 @@ void github(){
 }
 
 void about(){
-    FILE *fptr = popen("curl -s https://raw.githubusercontent.com/BlessedForever04/Compressor-tool/main/README.md", "r");
+    FILE *fptr = popen("curl -s https://raw.githubusercontent.com/BlessedForever04/Compressor-tool/main/README.md?t=1d", "r");
     char response[1024];
     while(fgets(response, sizeof(response), fptr)){
-        printf("%s", response);
+        // printf("%s", response);
+        char *character = response;
+        while(*character != '\n'){
+            if((*character != '#') && (*character != '`') && (*character != '*')){
+                printf("%c", *character);
+            }
+            character++;
+        }
+        printf("\n");
     }
 }
