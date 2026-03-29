@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "Data-Structures/frequency_array.h"
+#include "DataStructures\frequency_array.h"
 // <flag bit of h/n type> <tree start flag> <tree> <tree end flag> <frequency 
 struct Frequency_array frequency_array;
 void decompress(){

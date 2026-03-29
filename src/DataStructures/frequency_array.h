@@ -39,3 +39,11 @@ void add(struct Frequency_array *array, uint8_t data){
    array->item[array->count].frequency = 1;
    array->count++;
 }
+
+void customPrint(struct Frequency_array array){
+    int temp = 0;
+    while(temp != array.count){
+        printf("Data: %d Frequency: %d\n", array.item[temp].data, array.item[temp].frequency);
+        temp++;
+    }
+}
