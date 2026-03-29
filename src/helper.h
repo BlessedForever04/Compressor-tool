@@ -19,9 +19,9 @@ void normalCompression(){
     //huffman
     // Read bytes -> get its frequency
     // -> build huffman tree -> generate code (0 / 1) -> bit packing and legal count -> output
-    int *character = NULL;
-    while((character = getcha()) != EOF){
-        add(&frequency_array, *character); 
+    int character;
+    while((character = getchar()) != EOF){
+        add(&frequency_array, character); 
     }
     customPrint(frequency_array);
 }
