@@ -4,16 +4,16 @@
 #include "pair.h"
 
 struct Frequency_array{
-   struct Pair *item;
+   struct Pair *pair;
    size_t count;
    size_t capacity; 
 };
 
-void add(struct Frequency_array *array, uint8_t data){
+void addPair(struct Frequency_array *array, uint8_t data){
 
    for(size_t i = 0; i < array->count; i++){
-      if(array->item[i].data == data){
-         array->item[i].frequency++;
+      if(array->pair[i].data == data){
+         array->pair[i].frequency++;
          return;
       }
    }
@@ -25,25 +25,24 @@ void add(struct Frequency_array *array, uint8_t data){
          array->capacity *= 2;
       }
 
-      struct Pair *newItem = realloc(array->item,
-                                     array->capacity * sizeof(struct Pair));
-      if(newItem == NULL){
+      struct Pair *newpair = realloc(array->pair, array->capacity * sizeof(struct Pair));
+      if(newpair == NULL){
          printf("Memory allocation failed\n");
          exit(1);
       }
 
-      array->item = newItem;
+      array->pair = newpair;
    }
 
-   array->item[array->count].data = data;
-   array->item[array->count].frequency = 1;
+   array->pair[array->count].data = data;
+   array->pair[array->count].frequency = 1;
    array->count++;
 }
 
 void customPrint(struct Frequency_array array){
     int temp = 0;
     while(temp != array.count){
-        printf("Data: %d Frequency: %d\n", array.item[temp].data, array.item[temp].frequency);
+        printf("Data: %d Frequency: %d\n", array.pair[temp].data, array.pair[temp].frequency);
         temp++;
     }
 }

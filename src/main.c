@@ -7,7 +7,7 @@
 // convert byptes into bits -> iterate till legal count -> traverse tree using the path -> get real bytes -> output 
 // Huffman algorithm -> Normal compression
 // LZMA algorithm -> High cmopression
-
+// Add multi threading to make it fun (wherever its possbile);
 int main(int argc, char* argv[]){
 
     if(argc == 2){

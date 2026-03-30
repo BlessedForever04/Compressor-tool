@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "DataStructures\frequency_array.h"
+#include "DataStructures\tree_array.h"
 // <flag bit of h/n type> <tree start flag> <tree> <tree end flag> <frequency 
 struct Frequency_array frequency_array;
+struct Tree_array tree_array;
 void decompress(){
     //find bit flag (h/n type)
     // convert byptes into bits -> iterate till legal count -> traverse tree using the path -> get real bytes -> output 
@@ -21,9 +23,13 @@ void normalCompression(){
     // -> build huffman tree -> generate code (0 / 1) -> bit packing and legal count -> output
     int character;
     while((character = getchar()) != EOF){
-        add(&frequency_array, character); 
+        addPair(&frequency_array, character); 
     }
-    customPrint(frequency_array);
+    for(int i = 0; i < frequency_array.count; i++){
+        addNode(&tree_array, frequency_array.pair[i]);
+    }
+    
+    tempPrint(tree_array);
 }
 
 void help(){
