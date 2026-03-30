@@ -73,10 +73,23 @@ void tempPrint(struct Tree_array tree_array){
         printf("Data: %c    Frequency: %d\n", tree_array.node[i].pair.data, tree_array.node[i].pair.frequency);
     }
 }
+
+void reverse(struct Tree_array *tree_array){
+    int i = 0;
+    int j = tree_array->count - 1;
+
+    while(i < j){
+        swapData(&tree_array->node[i].pair.data, &tree_array->node[j].pair.data);
+        swapFrequency(&tree_array->node[i].pair.frequency, &tree_array->node[j].pair.frequency);
+        i++;
+        j--;
+    }
+}
 void buildTree(struct Tree_array *tree_array){
     printf("Before:\n");
     tempPrint(*tree_array);
     quickSort(tree_array, 0, tree_array->count);
+    reverse(tree_array);
     printf("\nAfter:\n");
     tempPrint(*tree_array);
 }
