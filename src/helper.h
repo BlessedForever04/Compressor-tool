@@ -16,20 +16,26 @@ void highCompression(){
 // lets create a array storing a pair of byte and its frequency
 // Then I'll sort it
 // then I have to create tree based on that frequency
+void calculateFrequencies(){
+    int character;
+    while((character = getchar()) != EOF){
+        addPair(&frequency_array, character); 
+    }
+}
+
+void createHuffmanTree(){
+    for(int i = 0; i < frequency_array.count; i++){
+        addNode(&tree_array, frequency_array.pair[i]);
+    }
+    buildTree(&tree_array);  
+}
 
 void normalCompression(){
     //huffman
     // Read bytes -> get its frequency
     // -> build huffman tree -> generate code (0 / 1) -> bit packing and legal count -> output
-    int character;
-    while((character = getchar()) != EOF){
-        addPair(&frequency_array, character); 
-    }
-    for(int i = 0; i < frequency_array.count; i++){
-        addNode(&tree_array, frequency_array.pair[i]);
-    }
-    
-    tempPrint(tree_array);
+    calculateFrequencies();
+    createHuffmanTree();
 }
 
 void help(){

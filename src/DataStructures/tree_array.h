@@ -8,32 +8,40 @@ struct Tree_array{
     size_t capacity;
 };
 
-void swap(int *a, int *b) {
+void swapFrequency(int *a, int *b) {
     int temp = *a;
     *a = *b;
     *b = temp;
 }
 
-int partition(int arr[], int low, int high) {
-    int pivot = arr[low];
+void swapData(uint8_t *a, uint8_t *b) {
+    uint8_t temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int partition(struct Tree_array *tree_array, int low, int high) {
+    int pivot = tree_array->node[low].pair.frequency;
     int i = low + 1;
     int j = high;
 
     while (1) {
-        while (i <= high && arr[i] <= pivot) i++;
-        while (arr[j] > pivot) j--;
+        while (i <= high && tree_array->node[i].pair.frequency <= pivot) i++;
+        while (tree_array->node[j].pair.frequency > pivot) j--;
         if (i >= j) break;
-        swap(&arr[i], &arr[j]);
+        swapFrequency(&tree_array->node[i].pair.frequency, &tree_array->node[j].pair.frequency);
+        swapData(&tree_array->node[i].pair.data, &tree_array->node[j].pair.data);
     }
-    swap(&arr[low], &arr[j]);
+    swapFrequency(&tree_array->node[low].pair.frequency, &tree_array->node[j].pair.frequency);
+    swapData(&tree_array->node[low].pair.data, &tree_array->node[j].pair.data);
     return j;
 }
 
-void quickSort(int arr[], int low, int high) {
+void quickSort(struct Tree_array *tree_array, int low, int high) {
     if (low < high) {
-        int p = partition(arr, low, high);
-        quickSort(arr, low, p - 1); 
-        quickSort(arr, p + 1, high);
+        int p = partition(tree_array, low, high);
+        quickSort(tree_array, low, p - 1); 
+        quickSort(tree_array, p + 1, high);
     }
 }
 
@@ -62,6 +70,13 @@ void addNode(struct Tree_array *tree_array, struct Pair pairData){
 
 void tempPrint(struct Tree_array tree_array){
     for(int i = 0; i < tree_array.count; i++){
-        printf("Data: %d    Frequency: %d\n", tree_array.node[i].pair.data, tree_array.node[i].pair.frequency);
+        printf("Data: %c    Frequency: %d\n", tree_array.node[i].pair.data, tree_array.node[i].pair.frequency);
     }
+}
+void buildTree(struct Tree_array *tree_array){
+    printf("Before:\n");
+    tempPrint(*tree_array);
+    quickSort(tree_array, 0, tree_array->count);
+    printf("\nAfter:\n");
+    tempPrint(*tree_array);
 }
