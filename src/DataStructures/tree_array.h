@@ -20,8 +20,20 @@ void swapData(uint8_t *a, uint8_t *b) {
     *b = temp;
 }
 
-void merge(){
+void merge(struct Tree_array *tree_array){
+    struct Node node1;
+    struct Node node2;
+    struct Node merged;
 
+    node1 = tree_array->node[tree_array->count - 2];
+    node2 = tree_array->node[tree_array->count - 1];
+    merged.pair.data = -1;
+    merged.pair.frequency = node1.pair.frequency + node2.pair.frequency;
+    merged.left = &node1;
+    merged.right = &node2;
+
+    tree_array->count--;
+    tree_array->node[tree_array->count] = merged;
 }
 
 void addNode(struct Tree_array *tree_array, struct Pair pairData){
@@ -88,11 +100,14 @@ void quickSort(struct Tree_array *tree_array, int low, int high) {
 }
 
 void buildTree(struct Tree_array *tree_array){
-    printf("Before:\n");
-    tempPrint(*tree_array);
+    // printf("Before:\n");
+    // tempPrint(*tree_array);
     quickSort(tree_array, 0, tree_array->count);
     reverse(tree_array);
-    printf("\nAfter:\n");
-    tempPrint(*tree_array);
-    
+    // printf("\nAfter:\n");
+    // tempPrint(*tree_array);
+    while(tree_array->count >= 2){
+        merge(tree_array);    
+    }
+    printf("The count is : %d", tree_array->count);
 }
