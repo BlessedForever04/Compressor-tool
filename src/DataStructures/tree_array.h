@@ -8,32 +8,27 @@ struct Tree_array{
     size_t capacity;
 };
 
-void swapFrequency(int *a, int *b) {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
-}
-
-void swapData(uint8_t *a, uint8_t *b) {
-    uint8_t temp = *a;
-    *a = *b;
-    *b = temp;
+void swapNode(struct Node *node1, struct Node *node2){
+    struct Node temp;
+    temp = *node1;
+    *node1 = *node2;
+    *node2 = temp;
 }
 
 void merge(struct Tree_array *tree_array){
-    struct Node node1;
-    struct Node node2;
+    struct Node *node1 = malloc(sizeof(struct Node));
+    struct Node *node2 = malloc(sizeof(struct Node));
     struct Node merged;
 
-    node1 = tree_array->node[tree_array->count - 2];
-    node2 = tree_array->node[tree_array->count - 1];
-    merged.pair.data = -1;
-    merged.pair.frequency = node1.pair.frequency + node2.pair.frequency;
-    merged.left = &node1;
-    merged.right = &node2;
+    *node1 = tree_array->node[tree_array->count - 2];
+    *node2 = tree_array->node[tree_array->count - 1];
+    merged.pair.data = 0;
+    merged.pair.frequency = node1->pair.frequency + node2->pair.frequency;
+    merged.left = node1;
+    merged.right = node2;
 
     tree_array->count--;
-    tree_array->node[tree_array->count] = merged;
+    tree_array->node[tree_array->count-1] = merged;
 }
 
 void addNode(struct Tree_array *tree_array, struct Pair pairData){
@@ -52,6 +47,8 @@ void addNode(struct Tree_array *tree_array, struct Pair pairData){
       tree_array->node = newNode;
    }
     
+   tree_array->node[tree_array->count].left = NULL;
+   tree_array->node[tree_array->count].right = NULL;
    tree_array->node[tree_array->count++].pair = pairData;
 }
 
@@ -66,29 +63,31 @@ void reverse(struct Tree_array *tree_array){
     int j = tree_array->count - 1;
 
     while(i < j){
-        swapData(&tree_array->node[i].pair.data, &tree_array->node[j].pair.data);
-        swapFrequency(&tree_array->node[i].pair.frequency, &tree_array->node[j].pair.frequency);
+        swapNode(&tree_array->node[i], &tree_array->node[j]);
         i++;
         j--;
     }
 }
 
-
 int partition(struct Tree_array *tree_array, int low, int high) {
     int pivot = tree_array->node[low].pair.frequency;
-    int i = low + 1;
-    int j = high;
+    int i = low - 1;
+    int j = high + 1;
 
     while (1) {
-        while (i <= high && tree_array->node[i].pair.frequency <= pivot) i++;
-        while (tree_array->node[j].pair.frequency > pivot) j--;
-        if (i >= j) break;
-        swapFrequency(&tree_array->node[i].pair.frequency, &tree_array->node[j].pair.frequency);
-        swapData(&tree_array->node[i].pair.data, &tree_array->node[j].pair.data);
+        do {
+            i++;
+        } while (tree_array->node[i].pair.frequency < pivot);
+
+        do {
+            j--;
+        } while (tree_array->node[j].pair.frequency > pivot);
+
+        if (i >= j)
+            return j;
+
+        swapNode(&tree_array->node[i], &tree_array->node[j]);
     }
-    swapFrequency(&tree_array->node[low].pair.frequency, &tree_array->node[j].pair.frequency);
-    swapData(&tree_array->node[low].pair.data, &tree_array->node[j].pair.data);
-    return j;
 }
 
 void quickSort(struct Tree_array *tree_array, int low, int high) {
@@ -99,15 +98,26 @@ void quickSort(struct Tree_array *tree_array, int low, int high) {
     }
 }
 
-void buildTree(struct Tree_array *tree_array){
-    // printf("Before:\n");
-    // tempPrint(*tree_array);
-    quickSort(tree_array, 0, tree_array->count);
-    reverse(tree_array);
-    // printf("\nAfter:\n");
-    // tempPrint(*tree_array);
-    while(tree_array->count >= 2){
-        merge(tree_array);    
+void printTree(struct Node root){
+
+    if(root.pair.data == 0){
+        printf("%d ", root.pair.data);
     }
-    printf("The count is : %d", tree_array->count);
+    else{
+        printf("%c ", root.pair.data);
+    }
+    if(root.left){
+        printTree(*root.left);
+    }
+    if(root.right){
+        printTree(*root.right);
+    }
+}
+
+void buildTree(struct Tree_array *tree_array){
+    while(tree_array->count >= 2){
+        quickSort(tree_array, 0, tree_array->count - 1);
+        reverse(tree_array);
+        merge(tree_array);
+    }
 }

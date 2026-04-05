@@ -39,7 +39,7 @@ void addPair(struct Frequency_array *array, uint8_t data){
    array->count++;
 }
 
-void customPrint(struct Frequency_array array){
+void printFrequencyArray(struct Frequency_array array){
     int temp = 0;
     while(temp != array.count){
         printf("Data: %d Frequency: %d\n", array.pair[temp].data, array.pair[temp].frequency);
