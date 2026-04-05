@@ -120,4 +120,11 @@ void buildTree(struct Tree_array *tree_array){
         reverse(tree_array);
         merge(tree_array);
     }
+    struct Node *newNode = realloc(tree_array->node, sizeof(struct Node));
+    if(newNode == NULL){
+        printf("Failed to reallocate memory!");
+    }
+    else{
+        tree_array->node = newNode;
+    }
 }
