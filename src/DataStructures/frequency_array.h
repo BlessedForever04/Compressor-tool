@@ -4,9 +4,9 @@
 #include "pair.h"
 
 struct Frequency_array{
-   struct Pair *pair;
    size_t count;
    size_t capacity; 
+   struct Pair *pair;
 };
 
 void addPair(struct Frequency_array *array, uint8_t data){

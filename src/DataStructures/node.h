@@ -3,7 +3,7 @@
 #include "pair.h"
 
 struct Node{
-    struct Pair pair;
     struct Node *left;
     struct Node *right;
+    struct Pair pair;
 };

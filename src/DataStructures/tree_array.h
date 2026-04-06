@@ -3,9 +3,9 @@
 #include "node.h"
 
 struct Tree_array{
-    struct Node *node;
     size_t count;
     size_t capacity;
+    struct Node *node;
 };
 
 void swapNode(struct Node *node1, struct Node *node2){
