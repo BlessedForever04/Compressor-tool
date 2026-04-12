@@ -8,6 +8,8 @@
 // Huffman algorithm -> Normal compression
 // LZMA algorithm -> High cmopression
 // Add multi threading to make it fun (wherever its possbile);
+
+// run length encoding can be used before implementing huffman tree to compress more - experiment
 int main(int argc, char* argv[]){
 
     if(argc == 2){

@@ -2,28 +2,28 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-struct DataArray{
+struct Data_array{
     int *data;
     size_t count;
     size_t capacity;
 };
 
-void addData(struct DataArray *dataArray, int data){
-    if(dataArray->count == dataArray->capacity){
-        if(dataArray->capacity == 0){
-            dataArray->capacity = 1;
+void addData(struct Data_array *data_array, int data){
+    if(data_array->count == data_array->capacity){
+        if(data_array->capacity == 0){
+            data_array->capacity = 1;
         }
         else{
-            dataArray->capacity = dataArray->capacity*2;
+            data_array->capacity = data_array->capacity*2;
         }
 
-        int *newData = realloc(dataArray->data, dataArray->capacity * (sizeof(int)));
+        int *newData = realloc(data_array->data, data_array->capacity * (sizeof(int)));
         if(newData == NULL){
             printf("Failed to allocate memory!");
             return;
         }
-        dataArray->data = newData;
+        data_array->data = newData;
     }
 
-    dataArray->data[dataArray->count++] = data;
+    data_array->data[data_array->count++] = data;
 }
