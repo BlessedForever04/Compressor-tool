@@ -40,17 +40,23 @@ void getEncoding(struct Node root, char target, struct My_string *temp, char *is
         if(root.left == NULL && root.right == NULL){
             if(root.pair.data == target){
                 *isFound = '1';
+                printf("FOUND %c\n", root.pair.data);
             }
             else{
+                printf("Target miss so revert T:%c N:%c\n", target, root.pair.data);
                 temp->count--;
             }
         }
         else{
             appendChar(temp, '0');
+            printf("Went left\n");
             getEncoding(*root.left, target, temp, isFound);
             if(*isFound != '1'){
+                printf("Went right\n");
                 appendChar(temp, '1');
                 getEncoding(*root.right, target, temp, isFound); 
+                printf("NOT LR BACK\n");
+                temp->count--;
             }
         }
     }
