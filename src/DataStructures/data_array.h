@@ -8,7 +8,7 @@ struct Data_array{
     size_t capacity;
 };
 
-void addData(struct Data_array *data_array, int data){
+void addDataInDataArray(struct Data_array *data_array, int data){
     if(data_array->count == data_array->capacity){
         if(data_array->capacity == 0){
             data_array->capacity = 1;

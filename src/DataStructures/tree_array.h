@@ -31,7 +31,7 @@ void merge(struct Tree_array *tree_array){
     tree_array->node[tree_array->count-1] = merged;
 }
 
-void addNode(struct Tree_array *tree_array, struct Pair pairData){
+void addNodeInTreeArray(struct Tree_array *tree_array, struct Pair pairData){
    if(tree_array->count == tree_array->capacity){
       if(tree_array->capacity == 0){
          tree_array->capacity = 1;
@@ -127,4 +127,7 @@ void buildTree(struct Tree_array *tree_array){
     else{
         tree_array->node = newNode;
     }
+    printf("Printing Tree:\n");
+    printTree(tree_array->node[0]);
+    printf("\n\nTree printed\n");
 }

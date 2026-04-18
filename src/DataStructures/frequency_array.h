@@ -9,7 +9,7 @@ struct Frequency_array{
    struct Pair *pair;
 };
 
-void addPair(struct Frequency_array *array, uint8_t data){
+void addPairInFrequencyArray(struct Frequency_array *array, uint8_t data){
 
    for(size_t i = 0; i < array->count; i++){
       if(array->pair[i].data == data){

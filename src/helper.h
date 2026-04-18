@@ -23,42 +23,42 @@ void highCompression(){
 void calculateFrequencies(){
     int character;
     while((character = getchar()) != EOF){
-        addData(&data_array, character);
-        addPair(&frequency_array, character); 
+        addDataInDataArray(&data_array, character);
+        addPairInFrequencyArray(&frequency_array, character); 
     }
 }
 
 void createHuffmanTree(){
     for(int i = 0; i < frequency_array.count; i++){
-        addNode(&tree_array, frequency_array.pair[i]);
+        addNodeInTreeArray(&tree_array, frequency_array.pair[i]);
     }
     buildTree(&tree_array);  
 }
 
-void getEncoding(struct Node root, char target, struct My_string *temp, char *isFound){
-    if(*isFound != '1'){
-        if(root.left == NULL && root.right == NULL){
-            if(root.pair.data == target){
-                *isFound = '1';
-                printf("FOUND %c\n", root.pair.data);
-            }
-            else{
-                printf("Target miss so revert T:%c N:%c\n", target, root.pair.data);
-                temp->count--;
-            }
+char createEncoding(struct Node root, char target, struct My_string *temp){
+    if(root.left == NULL && root.right == NULL){
+        if(root.pair.data == target){
+            printf("FOUND %c\n", root.pair.data);
+            return '1';
         }
         else{
-            appendChar(temp, '0');
-            printf("Went left\n");
-            getEncoding(*root.left, target, temp, isFound);
-            if(*isFound != '1'){
-                printf("Went right\n");
-                appendChar(temp, '1');
-                getEncoding(*root.right, target, temp, isFound); 
-                printf("NOT LR BACK\n");
-                temp->count--;
-            }
+            printf("Target miss so revert T:%c N:%c\n", target, root.pair.data);
+            temp->count--;
         }
+    }
+    else{
+        appendChar(temp, '0');
+        printf("Went left\n");
+        if(createEncoding(*root.left, target, temp) == '1'){
+            return '1';
+        }
+        printf("Went right\n");
+        appendChar(temp, '1');
+        if(createEncoding(*root.right, target, temp) == '1'){
+            return '1';
+        }
+        printf("NOT LR BACK\n");
+        temp->count--;
     }
 }
 
@@ -66,21 +66,15 @@ void createDataBuffer(){
     // Binary encoding of actual data using tree
     struct My_string temp = {NULL, 0, 0};
     struct My_string encoding = {NULL, 0, 0};
-    char isFound = '0';
 
     for(int i = 0; i < data_array.count; i++){
-        getEncoding(tree_array.node[0], data_array.data[i], &temp, &isFound);
+        createEncoding(tree_array.node[0], data_array.data[i], &temp);
         appendStr(&encoding, temp);
         format(&temp);
-        isFound = '0';
-    }
-
-    for(int i = 0; i < encoding.count; i++){
-        printf("%c ", encoding.item[i]);
-    }
+    }// At this point, i have proper encoding created out of tree (0/1) XD
 }
 
-void serializeTree(struct Node *root){
+void storeTree(struct Node *root){
     if(!root) return;
 
     if(root->left == NULL && root->right == NULL){
@@ -89,15 +83,15 @@ void serializeTree(struct Node *root){
     }
     else{
         putchar(0);
-        serializeTree(root->left);
-        serializeTree(root->right);
+        storeTree(root->left);
+        storeTree(root->right);
     } 
 }
 
 void output(){
     putchar(0); // Flag of compression type
     putchar((frequency_array.count*2 + frequency_array.count - 1)); // Size of tree buffer
-    serializeTree(&tree_array.node[0]);
+    storeTree(&tree_array.node[0]); // serialization
     createDataBuffer(); 
 }
 

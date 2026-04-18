@@ -3,6 +3,27 @@
 #include <string.h>
 #include "helper.h"
 
+// Documentation:
+
+// Basic info:
+// 2 modes for data compression 
+// - Huffman algorithm for normal data compression (flag = 0)
+// - LZMA Algorithm for high compresssion (flag = 1)
+
+// Using bit flags for classification of compression type
+// - 0 for Huffman : 1 for LZMA
+
+// Serialization of tree
+// - 1 if no children found and 0 if it has children
+// - example : 0 0 1 75 1 89
+// - Check helper.h serializeTree() for more clarification
+
+// Algorithm for Huffman
+// - Compression: Read bytes -> get its frequency (stored in frequency_array) -> Build huffman tree (stored in tree_array) -> store flag + tree size + serializeTree in output -> create encoding (0/1) -> Bit packing and legal count -> output
+// - Decompression: Read flag -> get tree size -> iterate(tree size) and deserializeTree -> unpack bits -> get output
+
+
+
 // Read bytes -> get its frequency -> build huffman tree -> generate code (0 / 1) -> bit packing and legal count -> output
 // convert byptes into bits -> iterate till legal count -> traverse tree using the path -> get real bytes -> output 
 // Huffman algorithm -> Normal compression
@@ -24,6 +45,9 @@ int main(int argc, char* argv[]){
         }
         else if(strcmp(argv[1], "-d") == 0){
             decompress();
+        }
+        else{
+            error();
         }
     }
     else if(argc == 3){
