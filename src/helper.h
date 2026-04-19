@@ -38,32 +38,28 @@ void createHuffmanTree(){
 char createEncoding(struct Node root, char target, struct My_string *temp){
     if(root.left == NULL && root.right == NULL){
         if(root.pair.data == target){
-            printf("FOUND %c\n", root.pair.data);
             return '1';
         }
         else{
-            printf("Target miss so revert T:%c N:%c\n", target, root.pair.data);
             temp->count--;
         }
     }
     else{
         appendChar(temp, '0');
-        printf("Went left\n");
         if(createEncoding(*root.left, target, temp) == '1'){
             return '1';
         }
-        printf("Went right\n");
         appendChar(temp, '1');
         if(createEncoding(*root.right, target, temp) == '1'){
             return '1';
         }
-        printf("NOT LR BACK\n");
         temp->count--;
     }
 }
 
 void createDataBuffer(){
     // Binary encoding of actual data using tree
+    size_t validBit = 0;
     struct My_string temp = {NULL, 0, 0};
     struct My_string encoding = {NULL, 0, 0};
 
@@ -72,6 +68,16 @@ void createDataBuffer(){
         appendStr(&encoding, temp);
         format(&temp);
     }// At this point, i have proper encoding created out of tree (0/1) XD
+
+    validBit = encoding.count;
+    putchar(validBit);
+    // If encoding is not multiple of 8 then bit packing will not be done
+    while(encoding.count % 8 != 0){
+        appendChar(&encoding, '0');
+    }
+
+    // bit packing
+    
 }
 
 void storeTree(struct Node *root){

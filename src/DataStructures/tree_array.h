@@ -127,7 +127,4 @@ void buildTree(struct Tree_array *tree_array){
     else{
         tree_array->node = newNode;
     }
-    printf("Printing Tree:\n");
-    printTree(tree_array->node[0]);
-    printf("\n\nTree printed\n");
 }
