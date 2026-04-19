@@ -27,7 +27,6 @@ void addPairInFrequencyArray(struct Frequency_array *array, uint8_t data){
 
       struct Pair *newpair = realloc(array->pair, array->capacity * sizeof(struct Pair));
       if(newpair == NULL){
-         printf("Memory allocation failed\n");
          exit(1);
       }
 

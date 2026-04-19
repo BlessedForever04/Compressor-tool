@@ -57,6 +57,21 @@ char createEncoding(struct Node root, char target, struct My_string *temp){
     }
 }
 
+void bitPacking(struct My_string encoding){
+    unsigned char byte = 0;
+    uint8_t count = 0;
+    
+    for(int i = 0; i < encoding.count; i++){
+        count++;
+        byte = (byte << 1) | (encoding.item[i] - '0');
+        if(count == 8){
+            count = 0;
+            putchar(byte);
+            byte = 0;
+        }
+    }
+}
+
 void createDataBuffer(){
     // Binary encoding of actual data using tree
     size_t validBit = 0;
@@ -75,9 +90,8 @@ void createDataBuffer(){
     while(encoding.count % 8 != 0){
         appendChar(&encoding, '0');
     }
-
     // bit packing
-    
+    bitPacking(encoding);
 }
 
 void storeTree(struct Node *root){
@@ -95,10 +109,10 @@ void storeTree(struct Node *root){
 }
 
 void output(){
-    putchar(0); // Flag of compression type
-    putchar((frequency_array.count*2 + frequency_array.count - 1)); // Size of tree buffer
+    putchar(0); // Flag of huffman compression type
+    putchar((frequency_array.count*2 + frequency_array.count - 1)); // Size of tree buffer - just iterate till this count and you get your ccomplete tree
     storeTree(&tree_array.node[0]); // serialization
-    createDataBuffer(); 
+    createDataBuffer();
 }
 
 void normalCompression(){

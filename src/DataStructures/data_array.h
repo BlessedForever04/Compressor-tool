@@ -19,7 +19,6 @@ void addDataInDataArray(struct Data_array *data_array, int data){
 
         int *newData = realloc(data_array->data, data_array->capacity * (sizeof(int)));
         if(newData == NULL){
-            printf("Failed to allocate memory!");
             return;
         }
         data_array->data = newData;

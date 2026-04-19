@@ -41,7 +41,6 @@ void addNodeInTreeArray(struct Tree_array *tree_array, struct Pair pairData){
 
       struct Node *newNode = realloc(tree_array->node, tree_array->capacity * sizeof(struct Node));
       if(newNode == NULL){
-         printf("Memory allocation failed\n");
          exit(1);
       }
       tree_array->node = newNode;
@@ -122,7 +121,7 @@ void buildTree(struct Tree_array *tree_array){
     }
     struct Node *newNode = realloc(tree_array->node, sizeof(struct Node));
     if(newNode == NULL){
-        printf("Failed to reallocate memory!");
+        exit(1);
     }
     else{
         tree_array->node = newNode;
