@@ -11,7 +11,7 @@
 // - LZMA Algorithm for high compresssion (flag = 1)
 
 // Output format:
-// type flag(0:Huffman/ 1:LZMA)(1 uint8) + Tree length (n uint32) + tree data (serialized) + Valid count (uint32) + Encoding
+// type flag('0':Huffman/ '1':LZMA)(char) + Tree length (n uint32) + tree data (serialized) + Valid count (uint32) + Encoding
 
 // Using bit flags for classification of compression type
 // - 0 for Huffman : 1 for LZMA
@@ -24,8 +24,6 @@
 // Algorithm for Huffman
 // - Compression: Read bytes -> get its frequency (stored in frequency_array) -> Build huffman tree (stored in tree_array) -> store flag + tree size + serializeTree in output -> create encoding (0/1) -> Bit packing and legal count -> output
 // - Decompression: Read flag -> get tree size -> iterate(tree size) and deserializeTree -> unpack bits -> get output
-
-
 
 // Read bytes -> get its frequency -> build huffman tree -> generate code (0 / 1) -> bit packing and legal count -> output
 // convert byptes into bits -> iterate till legal count -> traverse tree using the path -> get real bytes -> output 
@@ -46,26 +44,25 @@ int main(int argc, char* argv[]){
         else if (strcmp(argv[1], "-about") == 0) {
             about();
         }
-        else if(strcmp(argv[1], "-d") == 0){
-            decompress();
-        }
         else{
             error();
         }
     }
     else if(argc == 4){
         if(strcmp(argv[1], "-c") == 0){
+
+            struct My_string fileName = {NULL, 0, 0};
+            size_t argvLength = strlen(argv[3]);
+
+            for(int i = 0; i < argvLength; i++){
+                appendChar(&fileName, argv[3][i]);
+            }
+            appendChar(&fileName, *"\0");
+
             if(strcmp(argv[2], "-h") == 0){
-                highCompression();
+                highCompression(fileName);
             }
             else if(strcmp(argv[2], "-n") == 0){
-                struct My_string fileName = {NULL, 0, 0};
-                size_t argvLength = strlen(argv[3]);
-
-                for(int i = 0; i < argvLength; i++){
-                    appendChar(&fileName, argv[3][i]);
-                }
-                appendChar(&fileName, *"\0");
                 huffmanCompression(fileName);
             }
             else{
@@ -77,7 +74,25 @@ int main(int argc, char* argv[]){
         }
     }
     else{
-        error();
+        if(argc == 3){
+            if(strcmp(argv[1], "-d") == 0){
+                struct My_string fileName = {NULL, 0, 0};
+                size_t argvLength = strlen(argv[2]);
+                
+                for(int i = 0; i < argvLength; i++){
+                    appendChar(&fileName, argv[2][i]);
+                }
+                appendChar(&fileName, *"\0");
+                
+                decompress(fileName);
+            }
+            else{
+                error();
+            }
+        }
+        else{
+            error();
+        }
     }
 
     return 0;

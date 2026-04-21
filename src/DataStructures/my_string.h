@@ -28,6 +28,12 @@ void appendStr(struct My_string *mainStr, struct My_string Str){
     }
 }
 
+void appendNormalStr(struct My_string *mainStr, char *normalStr, size_t normalStrSize){
+    for(int i = 0; i < normalStrSize; i++){
+        appendChar(mainStr, normalStr[i]);
+    }
+}
+
 void format(struct My_string *temp){
     temp->count = 0;
 }
