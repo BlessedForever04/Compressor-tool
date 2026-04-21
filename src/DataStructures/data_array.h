@@ -2,13 +2,13 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-struct Data_array{
+typedef struct Data_array{
     uint8_t *data;
     size_t count;
     size_t capacity;
-};
+}Data_array_t;
 
-void addDataInDataArray(struct Data_array *data_array, uint8_t data){
+void addDataInDataArray(Data_array_t *data_array, uint8_t data){
     if(data_array->count == data_array->capacity){
         if(data_array->capacity == 0){
             data_array->capacity = 1;

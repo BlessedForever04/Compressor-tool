@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-struct Pair{
+typedef struct Pair{
     uint8_t data;
     int frequency;
-};
+}Pair_t;

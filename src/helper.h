@@ -6,9 +6,9 @@
 #include "DataStructures\data_array.h"
 #include "DataStructures\my_string.h"
 
-struct Frequency_array frequency_array;
-struct Tree_array tree_array = {0, 0, NULL};
-struct Data_array data_array = {NULL, 0, 0};
+Frequency_array_t frequency_array;
+Tree_array_t tree_array = {0, 0, NULL};
+Data_array_t data_array = {NULL, 0, 0};
 
 // type flag('0':Huffman/ '1':LZMA)(char) + Tree length (n uint32) + tree data (serialized) + Valid count (uint32) + Encoding
 
@@ -19,7 +19,7 @@ void rebuildTree(uint32_t treeLength, FILE *file){
     
 }
 
-void decompress(struct My_string fileName){
+void decompress(My_string_t fileName){
     //find bit flag (h/n type)
     FILE *file = fopen(fileName.item, "rb");
     
@@ -35,7 +35,7 @@ void decompress(struct My_string fileName){
         // huffman decompression
         uint32_t treeLength = 0;
         fread(&treeLength, sizeof(uint32_t), 1, file);
-        struct Node root = {NULL, NULL, {0, 0}};
+        Node_t root = {NULL, NULL, {0, 0}};
         rebuildTree(treeLength, file);
     }
     else{
@@ -51,13 +51,13 @@ void decompress(struct My_string fileName){
     // convert byptes into bits -> iterate till legal count -> traverse tree using the path -> get real bytes -> output 
 }
 
-void highCompression(struct My_string fileName){
+void highCompression(My_string_t fileName){
     //LZMA
     FILE *outputFile;
     fputc('1', outputFile);
 }
 
-void calculateFrequencies(struct My_string fileName){
+void calculateFrequencies(My_string_t fileName){
     FILE *file = fopen(fileName.item, "rb");
     if(file == NULL){
         perror("File not opened correctly!");
@@ -85,7 +85,7 @@ void createHuffmanTree(){
     buildTree(&tree_array); 
 }
 
-int createEncoding(struct Node root, uint8_t target, struct My_string *temp){
+int createEncoding(Node_t root, uint8_t target, My_string_t *temp){
     if(root.left == NULL && root.right == NULL){
         if(root.pair.data == target){
             return 1;
@@ -108,7 +108,7 @@ int createEncoding(struct Node root, uint8_t target, struct My_string *temp){
     return 0;
 }
 
-void bitPacking(struct My_string encoding, FILE *outputFile){
+void bitPacking(My_string_t encoding, FILE *outputFile){
     unsigned char byte = 0;
     uint8_t count = 0;
     
@@ -126,8 +126,8 @@ void bitPacking(struct My_string encoding, FILE *outputFile){
 void createDataBuffer(FILE *outputFile){
     // Binary encoding of actual data using tree
     uint32_t validBit = 0;
-    struct My_string temp = {NULL, 0, 0};
-    struct My_string encoding = {NULL, 0, 0};
+    My_string_t temp = {NULL, 0, 0};
+    My_string_t encoding = {NULL, 0, 0};
 
     for(int i = 0; i < data_array.count; i++){
         if(!createEncoding(tree_array.node[0], data_array.data[i], &temp)){
@@ -154,7 +154,7 @@ void createDataBuffer(FILE *outputFile){
     bitPacking(encoding, outputFile);
 }
 
-void storeTree(struct Node *root, FILE *outputFile){
+void storeTree(Node_t *root, FILE *outputFile){
     if(!root) return;
 
     if(root->left == NULL && root->right == NULL){
@@ -168,8 +168,8 @@ void storeTree(struct Node *root, FILE *outputFile){
     } 
 }
 
-void output(struct My_string fileName){
-    struct My_string rawOutputFileName = {NULL, 0, 0};
+void output(My_string_t fileName){
+    My_string_t rawOutputFileName = {NULL, 0, 0};
     for(int i = 0; i < fileName.count; i++){
         if(fileName.item[i] == '.'){
             break;
@@ -178,7 +178,7 @@ void output(struct My_string fileName){
             appendChar(&rawOutputFileName, fileName.item[i]);
         }
     }
-    struct My_string extension = {".compressed", 11, 12};
+    My_string_t extension = {".compressed", 11, 12};
     appendStr(&rawOutputFileName, extension);
     appendNormalStr(&rawOutputFileName, "\0", 1);
 
@@ -200,7 +200,7 @@ void output(struct My_string fileName){
     fclose(outputFile);
 }
 
-void huffmanCompression(struct My_string fileName){
+void huffmanCompression(My_string_t fileName){
     //huffman
     // Read bytes -> get its frequency
     // -> build huffman tree -> generate code (0 / 1) -> bit packing and legal count -> output

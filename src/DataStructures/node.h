@@ -2,8 +2,8 @@
 #include <stdint.h>
 #include "pair.h"
 
-struct Node{
-    struct Node *left;
-    struct Node *right;
-    struct Pair pair;
-};
+typedef struct Node{
+    Node_t *left;
+    Node_t *right;
+    Pair_t pair;
+}Node_t;

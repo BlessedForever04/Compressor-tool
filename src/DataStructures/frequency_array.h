@@ -3,13 +3,13 @@
 #include <stdint.h>
 #include "pair.h"
 
-struct Frequency_array{
+typedef struct Frequency_array{
    size_t count;
    size_t capacity; 
-   struct Pair *pair;
-};
+   Pair_t *pair;
+}Frequency_array_t;
 
-void addPairInFrequencyArray(struct Frequency_array *array, uint8_t data){
+void addPairInFrequencyArray(Frequency_array_t *array, uint8_t data){
 
    for(size_t i = 0; i < array->count; i++){
       if(array->pair[i].data == data){
@@ -25,7 +25,7 @@ void addPairInFrequencyArray(struct Frequency_array *array, uint8_t data){
          array->capacity *= 2;
       }
 
-      struct Pair *newpair = realloc(array->pair, array->capacity * sizeof(struct Pair));
+      Pair_t *newpair = realloc(array->pair, array->capacity * sizeof(Pair_t));
       if(newpair == NULL){
          exit(1);
       }
@@ -38,7 +38,7 @@ void addPairInFrequencyArray(struct Frequency_array *array, uint8_t data){
    array->count++;
 }
 
-void printFrequencyArray(struct Frequency_array array){
+void printFrequencyArray(Frequency_array_t array){
     int temp = 0;
     while(temp != array.count){
         printf("Data: %d Frequency: %d\n", array.pair[temp].data, array.pair[temp].frequency);

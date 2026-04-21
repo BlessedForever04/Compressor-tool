@@ -51,7 +51,7 @@ int main(int argc, char* argv[]){
     else if(argc == 4){
         if(strcmp(argv[1], "-c") == 0){
 
-            struct My_string fileName = {NULL, 0, 0};
+            My_string_t fileName = {NULL, 0, 0};
             size_t argvLength = strlen(argv[3]);
 
             for(int i = 0; i < argvLength; i++){
@@ -76,7 +76,7 @@ int main(int argc, char* argv[]){
     else{
         if(argc == 3){
             if(strcmp(argv[1], "-d") == 0){
-                struct My_string fileName = {NULL, 0, 0};
+                My_string_t fileName = {NULL, 0, 0};
                 size_t argvLength = strlen(argv[2]);
                 
                 for(int i = 0; i < argvLength; i++){
