@@ -50,13 +50,20 @@ int main(int argc, char* argv[]){
             error();
         }
     }
-    else if(argc == 3){
+    else if(argc == 4){
         if(strcmp(argv[1], "-c") == 0){
             if(strcmp(argv[2], "-h") == 0){
                 highCompression();
             }
             else if(strcmp(argv[2], "-n") == 0){
-                normalCompression();
+                struct My_string fileName = {NULL, 0, 0};
+                size_t argvLength = strlen(argv[3]);
+
+                for(int i = 0; i < argvLength; i++){
+                    appendChar(&fileName, argv[3][i]);
+                }
+                appendChar(&fileName, *"\0");
+                huffmanCompression(fileName);
             }
             else{
                 error();

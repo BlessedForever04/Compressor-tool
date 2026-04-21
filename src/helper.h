@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "DataStructures\frequency_array.h"
 #include "DataStructures\tree_array.h"
 #include "DataStructures\data_array.h"
@@ -11,50 +12,74 @@ struct Data_array data_array = {NULL, 0, 0};
 
 void decompress(){
     //find bit flag (h/n type)
+    int flag = getchar();
+    if(flag == 0){
+        // huffman decompression
+        
+    }
+    else{
+        // lzma decompression
+    }
     // convert byptes into bits -> iterate till legal count -> traverse tree using the path -> get real bytes -> output 
 }
 
 void highCompression(){
     //LZMA
 }
-// lets create a array storing a pair of byte and its frequency
-// Then I'll sort it
-// then I have to create tree based on that frequency
-void calculateFrequencies(){
-    int character;
-    while((character = getchar()) != EOF){
-        addDataInDataArray(&data_array, character);
-        addPairInFrequencyArray(&frequency_array, character); 
+
+void calculateFrequencies(struct My_string fileName){
+    FILE *file = fopen(fileName.item, "rb");
+    if(file == NULL){
+        perror("File not opened correctly!");
+        exit(1);
     }
+
+    unsigned char buffer[1024];
+
+    size_t bytesCount = 0;
+
+    while((bytesCount = fread(buffer, sizeof(unsigned char), 1024, file)) > 0){
+        for(int i = 0; i < bytesCount; i++){
+            addDataInDataArray(&data_array, buffer[i]);
+            addPairInFrequencyArray(&frequency_array, buffer[i]);
+        }
+    }
+
+    fclose(file);
 }
 
 void createHuffmanTree(){
     for(int i = 0; i < frequency_array.count; i++){
         addNodeInTreeArray(&tree_array, frequency_array.pair[i]);
     }
-    buildTree(&tree_array);  
+    buildTree(&tree_array); 
 }
 
-char createEncoding(struct Node root, char target, struct My_string *temp){
+int createEncoding(struct Node root, uint8_t target, struct My_string *temp){
     if(root.left == NULL && root.right == NULL){
         if(root.pair.data == target){
-            return '1';
+            return 1;
         }
-        else{
-            temp->count--;
-        }
+        return 0;
     }
-    else{
-        appendChar(temp, '0');
-        if(createEncoding(*root.left, target, temp) == '1'){
-            return '1';
-        }
-        appendChar(temp, '1');
-        if(createEncoding(*root.right, target, temp) == '1'){
-            return '1';
-        }
-        temp->count--;
+
+    size_t baseCount = temp->count;
+
+    appendChar(temp, '0');
+    if(createEncoding(*root.left, target, temp)){
+        return 1;
     }
+    temp->count = baseCount;
+    appendChar(temp, '1');
+    if(createEncoding(*root.right, target, temp)){
+        return 1;
+    }
+    temp->count = baseCount;
+    return 0;
+}
+
+void writeUint32(uint32_t value){
+    fwrite(&value, sizeof(value), 1, stdout);
 }
 
 void bitPacking(struct My_string encoding){
@@ -74,18 +99,27 @@ void bitPacking(struct My_string encoding){
 
 void createDataBuffer(){
     // Binary encoding of actual data using tree
-    size_t validBit = 0;
+    uint32_t validBit = 0;
     struct My_string temp = {NULL, 0, 0};
     struct My_string encoding = {NULL, 0, 0};
 
     for(int i = 0; i < data_array.count; i++){
-        createEncoding(tree_array.node[0], data_array.data[i], &temp);
+        if(!createEncoding(tree_array.node[0], data_array.data[i], &temp)){
+            fprintf(stderr, "Encoding failed for byte value %u\n", data_array.data[i]);
+            exit(1);
+        }
+
+        // Single-symbol files need at least one bit per symbol.
+        if(temp.count == 0){
+            appendChar(&temp, '0');
+        }
+
         appendStr(&encoding, temp);
         format(&temp);
     }// At this point, i have proper encoding created out of tree (0/1) XD
 
     validBit = encoding.count;
-    putchar(validBit);
+    writeUint32(validBit);
     // If encoding is not multiple of 8 then bit packing will not be done
     while(encoding.count % 8 != 0){
         appendChar(&encoding, '0');
@@ -110,16 +144,16 @@ void storeTree(struct Node *root){
 
 void output(){
     putchar(0); // Flag of huffman compression type
-    putchar((frequency_array.count*2 + frequency_array.count - 1)); // Size of tree buffer - just iterate till this count and you get your ccomplete tree
+    writeUint32((uint32_t)(frequency_array.count*2 + frequency_array.count - 1)); // Size of tree buffer - just iterate till this count and you get your ccomplete tree 
     storeTree(&tree_array.node[0]); // serialization
     createDataBuffer();
 }
 
-void normalCompression(){
+void huffmanCompression(struct My_string fileName){
     //huffman
     // Read bytes -> get its frequency
     // -> build huffman tree -> generate code (0 / 1) -> bit packing and legal count -> output
-    calculateFrequencies();
+    calculateFrequencies(fileName);
     createHuffmanTree();
     output();
 }
@@ -144,9 +178,9 @@ void github(){
 
 void about(){
     FILE *fptr = popen("curl -s https://raw.githubusercontent.com/BlessedForever04/Compressor-tool/main/README.md?t=1d", "r");
-    char response[1024];
+    unsigned char response[1024];
     while(fgets(response, sizeof(response), fptr)){
-        char *character = response;
+        unsigned char *character = response;
         while(*character != '\n'){
             if((*character != '#') && (*character != '`') && (*character != '*')){
                 printf("%c", *character);

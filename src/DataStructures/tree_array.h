@@ -103,7 +103,7 @@ void printTree(struct Node root){
         printf("%d ", root.pair.data);
     }
     else{
-        printf("%c ", root.pair.data);
+        printf("%d ", root.pair.data);
     }
     if(root.left){
         printTree(*root.left);
