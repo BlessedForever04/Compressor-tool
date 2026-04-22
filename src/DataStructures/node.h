@@ -3,7 +3,7 @@
 #include "pair.h"
 
 typedef struct Node{
-    Node_t *left;
-    Node_t *right;
+    struct Node *left;
+    struct Node *right;
     Pair_t pair;
 }Node_t;
