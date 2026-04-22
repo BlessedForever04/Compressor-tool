@@ -12,11 +12,46 @@ Data_array_t data_array = {NULL, 0, 0};
 
 // type flag('0':Huffman/ '1':LZMA)(char) + Tree length (n uint32) + tree data (serialized) + Valid count (uint32) + Encoding
 
+void deserializeTree(Node_t *currentNode, uint8_t treeBuffer[], uint32_t *currentBufferIndex, uint32_t treeLength){
+    if(*currentBufferIndex < treeLength){
+        uint8_t byte = treeBuffer[(*currentBufferIndex)++];
 
-void rebuildTree(uint32_t treeLength, FILE *file){
+        if(byte == 0){
+            currentNode->pair.data = 0;
+            currentNode->pair.frequency = 0;
+            Node_t *leftNode = malloc(sizeof(Node_t));
+            Node_t *rightNode = malloc(sizeof(Node_t));
+
+            leftNode->left = NULL;
+            leftNode->right = NULL;
+            rightNode->left = NULL;
+            rightNode->right = NULL;
+
+            currentNode->left = leftNode;
+            deserializeTree(currentNode->left, treeBuffer, currentBufferIndex, treeLength);
+            currentNode->right = rightNode;
+            deserializeTree(currentNode->right, treeBuffer, currentBufferIndex, treeLength);
+        }
+        else{
+            if(byte == 1){
+                currentNode->pair.data = treeBuffer[(*currentBufferIndex)++];
+                currentNode->pair.frequency = 0;
+                currentNode->left = NULL;
+                currentNode->right = NULL;
+            }
+            else{
+                printf("\nReading wrong stuff: %d\n", byte);
+            }
+        }
+    }
+}
+
+void rebuildTree(uint32_t treeLength, FILE *file, Node_t *root){
     uint8_t treeBuffer[treeLength];
     fread(treeBuffer, sizeof(uint8_t), treeLength, file); // no need of pointer as array = &array[0]
-    
+    uint32_t currentBufferIndex = 0;
+    deserializeTree(root, treeBuffer, &currentBufferIndex, treeLength);
+    // printTree(*root);
 }
 
 void decompress(My_string_t fileName){
@@ -36,7 +71,7 @@ void decompress(My_string_t fileName){
         uint32_t treeLength = 0;
         fread(&treeLength, sizeof(uint32_t), 1, file);
         Node_t root = {NULL, NULL, {0, 0}};
-        rebuildTree(treeLength, file);
+        rebuildTree(treeLength, file, &root); // Tree building done
     }
     else{
         if(compressionFlag == 1){
@@ -182,8 +217,6 @@ void output(My_string_t fileName){
     appendStr(&rawOutputFileName, extension);
     appendNormalStr(&rawOutputFileName, "\0", 1);
 
-    printf("Output file name is: %s", rawOutputFileName);
-
     unsigned char outputFileName[rawOutputFileName.count];
 
     for(int i = 0; i < rawOutputFileName.count; i++){
@@ -196,6 +229,7 @@ void output(My_string_t fileName){
     uint32_t treeLength = (uint32_t)(frequency_array.count*2 + frequency_array.count - 1);
     fwrite(&treeLength, sizeof(uint32_t), 1, outputFile); // Size of tree buffer - just iterate till this count and you get your ccomplete tree 
     storeTree(&tree_array.node[0], outputFile); // serialization
+    printTree(tree_array.node[0]);
     createDataBuffer(outputFile);
     fclose(outputFile);
 }
