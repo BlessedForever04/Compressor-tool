@@ -54,24 +54,51 @@ void rebuildTree(uint32_t treeLength, FILE *file, Node_t *root){
     // printTree(*root);
 }
 
+uint8_t* getEncoding(uint32_t encodingSize, FILE *compressedFile){
+    uint8_t *encoding = malloc(sizeof(uint8_t)*encodingSize);
+    fread(encoding, sizeof(uint8_t), encodingSize, compressedFile);
+    return encoding;
+}
+
+void decode(uint8_t *encoding, uint32_t encodingSize, My_string_t *actualData){
+    for(int i = 0; i < encodingSize; i++){
+        uint8_t byte = encoding[i];
+
+        for(int bit = 7; bit >= 0; bit--){
+            char c = ((byte>>bit) & 1) ? '1' : '0';
+            appendChar(actualData, c);
+        }
+    }
+}
+
 void decompress(My_string_t fileName){
     //find bit flag (h/n type)
-    FILE *file = fopen(fileName.item, "rb");
+    FILE *compressedFile = fopen(fileName.item, "rb");
     
-    if(file == NULL){
+    if(compressedFile == NULL){
         printf("File was not opened properly");
         exit(1);
     }
     
     uint8_t compressionFlag;
-    fread(&compressionFlag, 1, 1, file);
+    fread(&compressionFlag, 1, 1, compressedFile);
 
     if(compressionFlag == 0){
         // huffman decompression
         uint32_t treeLength = 0;
-        fread(&treeLength, sizeof(uint32_t), 1, file);
+        fread(&treeLength, 1, sizeof(uint32_t), compressedFile); // reading tree length
         Node_t root = {NULL, NULL, {0, 0}};
-        rebuildTree(treeLength, file, &root); // Tree building done
+        rebuildTree(treeLength, compressedFile, &root); // Tree building done
+        uint32_t validByte;
+        fread(&validByte, 1, sizeof(uint32_t), compressedFile); // reading valid bytes count
+        uint32_t encodingSize = (uint32_t)((validByte + 7) / 8);
+        uint8_t *encoding = getEncoding(encodingSize, compressedFile);
+        
+        // Now i Have tree, validByte and encoding
+        My_string_t actualData = {NULL, 0, 0};
+        decode(encoding, encodingSize, &actualData);// Retreived the actual encoding
+        //actual data is in 010101 for traversal, root is ready
+        
     }
     else{
         if(compressionFlag == 1){
@@ -82,7 +109,7 @@ void decompress(My_string_t fileName){
         }
         // lzma decompression
     }
-    fclose(file);
+    fclose(compressedFile);
     // convert byptes into bits -> iterate till legal count -> traverse tree using the path -> get real bytes -> output 
 }
 
@@ -160,7 +187,7 @@ void bitPacking(My_string_t encoding, FILE *outputFile){
 
 void createDataBuffer(FILE *outputFile){
     // Binary encoding of actual data using tree
-    uint32_t validBit = 0;
+    uint32_t validByte = 0;
     My_string_t temp = {NULL, 0, 0};
     My_string_t encoding = {NULL, 0, 0};
 
@@ -179,8 +206,8 @@ void createDataBuffer(FILE *outputFile){
         format(&temp);
     }// At this point, i have proper encoding created out of tree (0/1) XD
 
-    validBit = encoding.count;
-    fwrite(&validBit, sizeof(uint32_t), 1, outputFile);
+    validByte = encoding.count;
+    fwrite(&validByte, sizeof(uint32_t), 1, outputFile);
     // If encoding is not multiple of 8 then bit packing will not be done
     while(encoding.count % 8 != 0){
         appendChar(&encoding, '0');
@@ -229,7 +256,7 @@ void output(My_string_t fileName){
     uint32_t treeLength = (uint32_t)(frequency_array.count*2 + frequency_array.count - 1);
     fwrite(&treeLength, sizeof(uint32_t), 1, outputFile); // Size of tree buffer - just iterate till this count and you get your ccomplete tree 
     storeTree(&tree_array.node[0], outputFile); // serialization
-    printTree(tree_array.node[0]);
+    // printTree(tree_array.node[0]); // printing after building a tree during compression
     createDataBuffer(outputFile);
     fclose(outputFile);
 }
