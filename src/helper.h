@@ -96,6 +96,10 @@ void generateOutput(My_string_t *output, uint32_t validBit, My_string_t actualDa
 
 void decompress(My_string_t fileName){
     FILE *compressedFile = fopen(fileName.item, "rb");
+    if(compressedFile == NULL){
+        printf("File was not opened properly");
+        exit(1);
+    }
 
     //File name size
     size_t fileNameSize;
@@ -107,11 +111,9 @@ void decompress(My_string_t fileName){
     outputFileName.count = fileNameSize;
     outputFileName.capacity = fileNameSize + 1;
     fread(outputFileName.item, sizeof(unsigned char), fileNameSize, compressedFile);
+
+    appendNormalStr(&outputFileName, "\0", 1);
     
-    if(compressedFile == NULL){
-        printf("File was not opened properly");
-        exit(1);
-    }
     
     //find bit flag (h/n type)
     uint8_t compressionFlag;
@@ -144,30 +146,20 @@ void decompress(My_string_t fileName){
         generateOutput(&output, validBit, actualData, &root, outputFile);
         printf("Decompression done\n");
 
-        // deleting the compressed file
-        for(int i = 0; i < outputFileName.count; i++){
-            if(outputFileName.item[i] == '.'){
-                outputFileName.count = i+1;
-                break;
-            }
-        }
-
-        appendNormalStr(&outputFileName, "compressed\0", 11);
-        printf("File to remove: %s", outputFileName.item);
-        remove(outputFileName.item);
         fclose(outputFile);
     }
     else{
         if(compressionFlag == 1){
-
+            
         }
         else{
-
+            
         }
         // lzma decompression
     }
     fclose(compressedFile);
-    // convert byptes into bits -> iterate till legal count -> traverse tree using the path -> get real bytes -> output 
+    // deleting the compressed file
+    remove(outputFileName.item);
 }
 
 void highCompression(My_string_t fileName){
