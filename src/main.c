@@ -11,7 +11,7 @@
 // - LZMA Algorithm for high compresssion (flag = 1)
 
 // Output format:
-// type flag('0':Huffman/ '1':LZMA)(char) + Tree length (n uint32) + tree data (serialized) + Valid count (uint32) + Encoding
+// length of name (size_t) + name.extension (char*) + type flag('0':Huffman/ '1':LZMA)(char) + Tree length (n uint32) + tree data (serialized) + Valid count (uint32) + Encoding
 
 // Using bit flags for classification of compression type
 // - 0 for Huffman : 1 for LZMA

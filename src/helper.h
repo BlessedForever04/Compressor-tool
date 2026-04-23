@@ -10,7 +10,7 @@ Frequency_array_t frequency_array;
 Tree_array_t tree_array = {0, 0, NULL};
 Data_array_t data_array = {NULL, 0, 0};
 
-// type flag('0':Huffman/ '1':LZMA)(char) + Tree length (n uint32) + tree data (serialized) + Valid count (uint32) + Encoding
+// name length (size_t) + name.extension (char*) + type flag('0':Huffman/ '1':LZMA)(char) + Tree length (n uint32) + tree data (serialized) + Valid count (uint32) + Encoding
 
 void deserializeTree(Node_t *currentNode, uint8_t treeBuffer[], uint32_t *currentBufferIndex, uint32_t treeLength){
     if(*currentBufferIndex < treeLength){
@@ -71,34 +71,79 @@ void decode(uint8_t *encoding, uint32_t encodingSize, My_string_t *actualData){
     }
 }
 
+void generateOutput(My_string_t *output, uint32_t validBit, My_string_t actualData, Node_t *root, FILE *outputFile){
+    Node_t *currentNode = root;
+    for(int i = 0; i <= validBit; i++){
+        if(currentNode->left == NULL && currentNode->right == NULL){
+            //found
+            uint8_t character = currentNode->pair.data;
+            fwrite(&character, sizeof(uint8_t), 1, outputFile);
+            currentNode = root;
+            i--;
+        }
+        else{
+            if(actualData.item[i] == '1'){
+                currentNode = currentNode->right;
+            }
+            else{
+                if(actualData.item[i] == '0'){
+                    currentNode = currentNode->left;
+                }
+            }
+        }
+    }
+}
+
 void decompress(My_string_t fileName){
-    //find bit flag (h/n type)
     FILE *compressedFile = fopen(fileName.item, "rb");
+
+    //File name size
+    size_t fileNameSize;
+    fread(&fileNameSize, sizeof(size_t), 1, compressedFile);
+    printf("File name size is : %d\n", fileNameSize);
+
+    //original file name.extension
+    unsigned char *outputFileName;
+    fread(outputFileName, sizeof(unsigned char*), fileNameSize, compressedFile);
     
     if(compressedFile == NULL){
         printf("File was not opened properly");
         exit(1);
     }
     
+    //find bit flag (h/n type)
     uint8_t compressionFlag;
     fread(&compressionFlag, 1, 1, compressedFile);
-
+    
+    printf("I am here\n");
+    printf("Compression flag is : %d", compressionFlag);
     if(compressionFlag == 0){
+
         // huffman decompression
         uint32_t treeLength = 0;
         fread(&treeLength, 1, sizeof(uint32_t), compressedFile); // reading tree length
+
         Node_t root = {NULL, NULL, {0, 0}};
         rebuildTree(treeLength, compressedFile, &root); // Tree building done
-        uint32_t validByte;
-        fread(&validByte, 1, sizeof(uint32_t), compressedFile); // reading valid bytes count
-        uint32_t encodingSize = (uint32_t)((validByte + 7) / 8);
+
+        uint32_t validBit;
+        fread(&validBit, 1, sizeof(uint32_t), compressedFile); // reading valid bytes count
+
+        uint32_t encodingSize = (uint32_t)((validBit + 7) / 8);
         uint8_t *encoding = getEncoding(encodingSize, compressedFile);
         
         // Now i Have tree, validByte and encoding
         My_string_t actualData = {NULL, 0, 0};
         decode(encoding, encodingSize, &actualData);// Retreived the actual encoding
+        appendNormalStr(&actualData, "\0", 1);
+
         //actual data is in 010101 for traversal, root is ready
-        
+        My_string_t output = {NULL, 0, 0};
+        FILE *outputFile = fopen(outputFileName, "wb");
+    
+        generateOutput(&output, validBit, actualData, &root, outputFile);
+        printf("Decompression done\n");
+        fclose(outputFile);
     }
     else{
         if(compressionFlag == 1){
@@ -230,19 +275,17 @@ void storeTree(Node_t *root, FILE *outputFile){
     } 
 }
 
-void output(My_string_t fileName){
+void output(My_string_t inputFileName){
     My_string_t rawOutputFileName = {NULL, 0, 0};
-    for(int i = 0; i < fileName.count; i++){
-        if(fileName.item[i] == '.'){
+    for(int i = 0; i < inputFileName.count; i++){
+        if(inputFileName.item[i] == '.'){
             break;
         }
         else{
-            appendChar(&rawOutputFileName, fileName.item[i]);
+            appendChar(&rawOutputFileName, inputFileName.item[i]);
         }
     }
-    My_string_t extension = {".compressed", 11, 12};
-    appendStr(&rawOutputFileName, extension);
-    appendNormalStr(&rawOutputFileName, "\0", 1);
+    appendNormalStr(&rawOutputFileName, ".compressed\0", 12);
 
     unsigned char outputFileName[rawOutputFileName.count];
 
@@ -252,7 +295,16 @@ void output(My_string_t fileName){
 
     FILE *outputFile = fopen(outputFileName, "wb");
 
-    fputc((uint8_t)0, outputFile);// Flag of huffman compression type
+    appendNormalStr(&inputFileName, "\0", 1);
+
+    //length of name.extension
+
+    fwrite(&inputFileName.count, sizeof(size_t), 1, outputFile);
+    //name.extension
+    fwrite(inputFileName.item, sizeof(unsigned char*), inputFileName.count, outputFile);
+    // Flag of huffman compression type
+    fputc((uint8_t)0, outputFile);
+
     uint32_t treeLength = (uint32_t)(frequency_array.count*2 + frequency_array.count - 1);
     fwrite(&treeLength, sizeof(uint32_t), 1, outputFile); // Size of tree buffer - just iterate till this count and you get your ccomplete tree 
     storeTree(&tree_array.node[0], outputFile); // serialization
