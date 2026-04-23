@@ -100,11 +100,13 @@ void decompress(My_string_t fileName){
     //File name size
     size_t fileNameSize;
     fread(&fileNameSize, sizeof(size_t), 1, compressedFile);
-    printf("File name size is : %d\n", fileNameSize);
 
     //original file name.extension
-    unsigned char *outputFileName;
-    fread(outputFileName, sizeof(unsigned char*), fileNameSize, compressedFile);
+    My_string_t outputFileName;
+    outputFileName.item = malloc(fileNameSize + 1);
+    outputFileName.count = fileNameSize;
+    outputFileName.capacity = fileNameSize + 1;
+    fread(outputFileName.item, sizeof(unsigned char), fileNameSize, compressedFile);
     
     if(compressedFile == NULL){
         printf("File was not opened properly");
@@ -114,9 +116,7 @@ void decompress(My_string_t fileName){
     //find bit flag (h/n type)
     uint8_t compressionFlag;
     fread(&compressionFlag, 1, 1, compressedFile);
-    
-    printf("I am here\n");
-    printf("Compression flag is : %d", compressionFlag);
+
     if(compressionFlag == 0){
 
         // huffman decompression
@@ -139,10 +139,22 @@ void decompress(My_string_t fileName){
 
         //actual data is in 010101 for traversal, root is ready
         My_string_t output = {NULL, 0, 0};
-        FILE *outputFile = fopen(outputFileName, "wb");
+        FILE *outputFile = fopen(outputFileName.item, "wb");
     
         generateOutput(&output, validBit, actualData, &root, outputFile);
         printf("Decompression done\n");
+
+        // deleting the compressed file
+        for(int i = 0; i < outputFileName.count; i++){
+            if(outputFileName.item[i] == '.'){
+                outputFileName.count = i+1;
+                break;
+            }
+        }
+
+        appendNormalStr(&outputFileName, "compressed\0", 11);
+        printf("File to remove: %s", outputFileName.item);
+        remove(outputFileName.item);
         fclose(outputFile);
     }
     else{
@@ -295,13 +307,12 @@ void output(My_string_t inputFileName){
 
     FILE *outputFile = fopen(outputFileName, "wb");
 
-    appendNormalStr(&inputFileName, "\0", 1);
-
     //length of name.extension
+    inputFileName.count--;
 
     fwrite(&inputFileName.count, sizeof(size_t), 1, outputFile);
     //name.extension
-    fwrite(inputFileName.item, sizeof(unsigned char*), inputFileName.count, outputFile);
+    fwrite(inputFileName.item, sizeof(unsigned char), inputFileName.count, outputFile);
     // Flag of huffman compression type
     fputc((uint8_t)0, outputFile);
 
@@ -310,6 +321,10 @@ void output(My_string_t inputFileName){
     storeTree(&tree_array.node[0], outputFile); // serialization
     // printTree(tree_array.node[0]); // printing after building a tree during compression
     createDataBuffer(outputFile);
+
+    appendNormalStr(&inputFileName, "\0", 1);
+    printf("Removing during compression: %s\n", inputFileName.item);
+    remove(inputFileName.item);    
     fclose(outputFile);
 }
 
