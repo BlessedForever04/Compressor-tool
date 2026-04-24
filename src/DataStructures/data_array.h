@@ -2,12 +2,14 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+// Custom data type for storing actual data in bytes (this is basically vector (dynamic) of bytes)
 typedef struct Data_array{
     uint8_t *data;
     size_t count;
     size_t capacity;
 }Data_array_t;
 
+// Simple add function which reallocates memory on size exceeding
 void addDataInDataArray(Data_array_t *data_array, uint8_t data){
     if(data_array->count == data_array->capacity){
         if(data_array->capacity == 0){

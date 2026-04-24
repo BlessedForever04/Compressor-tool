@@ -3,14 +3,17 @@
 #include <stdint.h>
 #include "pair.h"
 
+// Data structor for storing frequencies of bytes (Vector (dynamic) of frequency of bytes)
 typedef struct Frequency_array{
    size_t count;
    size_t capacity; 
    Pair_t *pair;
 }Frequency_array_t;
 
+// Adding frequency
 void addPairInFrequencyArray(Frequency_array_t *array, uint8_t data){
 
+   // Increment frequency if byte already present
    for(size_t i = 0; i < array->count; i++){
       if(array->pair[i].data == data){
          array->pair[i].frequency++;
@@ -38,10 +41,11 @@ void addPairInFrequencyArray(Frequency_array_t *array, uint8_t data){
    array->count++;
 }
 
-void printFrequencyArray(Frequency_array_t array){
-    int temp = 0;
-    while(temp != array.count){
-        printf("Data: %d Frequency: %d\n", array.pair[temp].data, array.pair[temp].frequency);
-        temp++;
-    }
-}
+// Print function for debugging purpose
+// void printFrequencyArray(Frequency_array_t array){
+//     int temp = 0;
+//     while(temp != array.count){
+//         printf("Data: %d Frequency: %d\n", array.pair[temp].data, array.pair[temp].frequency);
+//         temp++;
+//     }
+// }

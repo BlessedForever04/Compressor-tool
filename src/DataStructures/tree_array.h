@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "node.h"
 
+// This is dynamic array of nodes which is used for building huffman tree
 typedef struct Tree_array{
     size_t count;
     size_t capacity;
@@ -15,6 +16,7 @@ void swapNode(Node_t*node1, Node_t *node2){
     *node2 = temp;
 }
 
+// Merging 2 nodes
 void merge(Tree_array_t *tree_array){
     Node_t *node1 = malloc(sizeof(Node_t));
     Node_t *node2 = malloc(sizeof(Node_t));
@@ -31,6 +33,7 @@ void merge(Tree_array_t *tree_array){
     tree_array->node[tree_array->count-1] = merged;
 }
 
+// adding new node to array
 void addNodeInTreeArray(Tree_array_t *tree_array, Pair_t pairData){
    if(tree_array->count == tree_array->capacity){
       if(tree_array->capacity == 0){
@@ -51,16 +54,11 @@ void addNodeInTreeArray(Tree_array_t *tree_array, Pair_t pairData){
    tree_array->node[tree_array->count++].pair = pairData;
 }
 
-void tempPrint(Tree_array_t tree_array){
-    for(int i = 0; i < tree_array.count; i++){
-        printf("Data: %c    Frequency: %d\n", tree_array.node[i].pair.data, tree_array.node[i].pair.frequency);
-    }
-}
-
+// Reversing the tree array
 void reverse(Tree_array_t *tree_array){
     int i = 0;
     int j = tree_array->count - 1;
-
+    
     while(i < j){
         swapNode(&tree_array->node[i], &tree_array->node[j]);
         i++;
@@ -68,23 +66,24 @@ void reverse(Tree_array_t *tree_array){
     }
 }
 
+// Quicksort partition function
 int partition(Tree_array_t *tree_array, int low, int high) {
     int pivot = tree_array->node[low].pair.frequency;
     int i = low - 1;
     int j = high + 1;
-
+    
     while (1) {
         do {
             i++;
         } while (tree_array->node[i].pair.frequency < pivot);
-
+        
         do {
             j--;
         } while (tree_array->node[j].pair.frequency > pivot);
-
+        
         if (i >= j)
-            return j;
-
+        return j;
+        
         swapNode(&tree_array->node[i], &tree_array->node[j]);
     }
 }
@@ -97,21 +96,6 @@ void quickSort(Tree_array_t *tree_array, int low, int high) {
     }
 }
 
-void printTree(Node_t root){
-
-    if(root.pair.data == 0){
-        printf("%d ", root.pair.data);
-    }
-    else{
-        printf("%d ", root.pair.data);
-    }
-    if(root.left){
-        printTree(*root.left);
-    }
-    if(root.right){
-        printTree(*root.right);
-    }
-}
 
 void buildTree(Tree_array_t *tree_array){
     while(tree_array->count >= 2){
@@ -127,3 +111,26 @@ void buildTree(Tree_array_t *tree_array){
         tree_array->node = newNode;
     }
 }
+
+// Debugging printing function for huffman tree
+// void printTree(Node_t root){
+//     if(root.pair.data == 0){
+//         printf("%d ", root.pair.data);
+//     }
+//     else{
+//         printf("%d ", root.pair.data);
+//     }
+//     if(root.left){
+//         printTree(*root.left);
+//     }
+//     if(root.right){
+//         printTree(*root.right);
+//     }
+// }
+
+// printing debugging function for array
+// void tempPrint(Tree_array_t tree_array){
+//     for(int i = 0; i < tree_array.count; i++){
+//         printf("Data: %c    Frequency: %d\n", tree_array.node[i].pair.data, tree_array.node[i].pair.frequency);
+//     }
+// }

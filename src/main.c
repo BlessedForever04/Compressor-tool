@@ -3,12 +3,16 @@
 #include <string.h>
 #include "helper.h"
 
+// LZMA - I was thinking of implementing it but I guess I'll be droping this idea as I am lacking of time
+// As a future upgrade I can implement lzma or lz77 for better compression
+// Still the current version may support further development for lz without big changes
+
 // Documentation:
 
 // Basic info:
 // 2 modes for data compression 
 // - Huffman algorithm for normal data compression (flag = 0)
-// - LZMA Algorithm for high compresssion (flag = 1)
+// - LZMA Algorithm for high compresssion (flag = 1) 
 
 // Output format:
 // length of name (size_t) + name.extension (char*) + type flag('0':Huffman/ '1':LZMA)(char) + Tree length (n uint32) + tree data (serialized) + Valid count (uint32) + Encoding
@@ -31,9 +35,19 @@
 // LZMA algorithm -> High cmopression
 // Add multi threading to make it fun (wherever its possbile);
 
-// run length encoding can be used before implementing huffman tree to compress more - experiment
+// - This file is only a CLI router. It validates user arguments and forwards work to helper.h.
+// - Actual compression and decompression pipelines are implemented in helper.h.
+// - Core data structures used by helper.h live in src/DataStructures/:
+//   data_array.h      -> stores the raw bytes read from input file
+//   frequency_array.h -> stores byte frequency table
+//   tree_array.h      -> builds/merges Huffman nodes into a tree
+//   my_string.h       -> custom dynamic string used across command handlers
+// - Current status: Huffman compression/decompression is implemented, high compression is a placeholder.
+
+// Main function for accepting user arguments
 int main(int argc, char* argv[]){
 
+    // Case A: informational commands without file IO.
     if(argc == 2){
         if (strcmp(argv[1], "help") == 0 || strcmp(argv[1], "-help") == 0) {
             help();
@@ -48,9 +62,11 @@ int main(int argc, char* argv[]){
             error();
         }
     }
+    // Case B: compression command with mode + input file.
     else if(argc == 4){
         if(strcmp(argv[1], "-c") == 0){
 
+            // Helper functions accept My_string_t, so convert argv[3] to project string type.
             My_string_t fileName = {NULL, 0, 0};
             size_t argvLength = strlen(argv[3]);
 
@@ -59,9 +75,11 @@ int main(int argc, char* argv[]){
             }
             appendChar(&fileName, *"\0");
 
+            // -h currently calls placeholder highCompression(), kept for future LZ support.
             if(strcmp(argv[2], "-h") == 0){
-                highCompression(fileName);
+                highCompression(fileName); // Not implemented
             }
+            // -n runs fully implemented Huffman compression pipeline.
             else if(strcmp(argv[2], "-n") == 0){
                 huffmanCompression(fileName);
             }
@@ -74,6 +92,7 @@ int main(int argc, char* argv[]){
         }
     }
     else{
+        // Case C: decompression command with compressed file.
         if(argc == 3){
             if(strcmp(argv[1], "-d") == 0){
                 My_string_t fileName = {NULL, 0, 0};
@@ -83,7 +102,7 @@ int main(int argc, char* argv[]){
                     appendChar(&fileName, argv[2][i]);
                 }
                 appendChar(&fileName, *"\0");
-                
+                // decompress() reads file header first, then routes by compression flag.
                 decompress(fileName);
             }
             else{
@@ -91,6 +110,7 @@ int main(int argc, char* argv[]){
             }
         }
         else{
+            // Guard branch for all unsupported argument counts/patterns.
             error();
         }
     }
