@@ -59,25 +59,24 @@ If you want to understand real compression logic (not only use a library), this 
 - Working: Huffman decompression via -d
 - Not implemented yet: high compression mode via -c -h (placeholder)
 
-# Show help
+## Show help
 compressor help
 compressor -help
 
-# Huffman compression (normal mode)
+## Huffman compression (normal mode)
 compressor -c -n input_file_name.extension
 
-# High compression placeholder (future)
+## High compression placeholder (future)
 compressor -c -h input_file_name.extension
 
-# Decompress a .compressed file
+## Decompress a .compressed file
 compressor -d some_file.compressed
 
-# Open project GitHub URL
+## Open project GitHub URL
 compressor -github
 
-# Print README info from GitHub using curl
+## Print README info from GitHub using curl
 compressor -about
-```
 
 Notes:
 
